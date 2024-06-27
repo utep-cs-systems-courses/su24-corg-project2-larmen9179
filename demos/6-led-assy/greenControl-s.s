@@ -9,7 +9,8 @@
 greenControl:
 	cmp #0, r12
 	jz off
-	bis #64, &P1OUT		;or
+	;1 is the green LED
+	bis #1, &P1OUT		;or
 	pop r0
-off:	and #~64, &P1OUT
+off:	and #~1, &P1OUT
 	pop r0
