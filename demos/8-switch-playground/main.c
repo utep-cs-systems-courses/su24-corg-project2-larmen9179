@@ -8,9 +8,12 @@
 #define SW1 BIT3		/* switch1 is p1.3 */
 #define SWITCHES SW1		/* only 1 switch on this board */
 
+
+
 void main(void) 
 {  
   configureClocks();
+  enableWDTInterrupts();
 
   P1DIR |= LEDS;
   P1OUT &= ~LEDS;		/* leds initially off */
@@ -23,6 +26,8 @@ void main(void)
   or_sr(0x18);  // CPU off, GIE on
 } 
 
+
+
 void
 switch_interrupt_handler()
 {
@@ -33,15 +38,42 @@ switch_interrupt_handler()
   P1IES &= (p1val | ~SWITCHES);	/* if switch down, sense up */
 
 /* up=red, down=green */
-  if (p1val & SW1) {
-    P1OUT |= LED_RED;
-    P1OUT |= LED_GREEN;
-  } else {
-    P1OUT &= ~LED_GREEN;
-    P1OUT &= ~LED_RED;
+  if (!(p1val & SW1)) {
+    light_switch();
   }
 }
 
+int lightState = 0;
+
+void
+light_switch(){
+
+  //static int lightState = 0;
+
+  /*
+  switch(lightState){
+  case 0:
+    P1OUT &= ~LEDS;
+    break;
+  case 1:
+    P1OUT |= LED_RED;
+    P1OUT &= ~LED_GREEN;
+    break;
+  case 2:
+    P1OUT |= LED_GREEN;
+    P1OUT &= ~LED_RED;
+    break;
+  case 3:
+    P1OUT |= LEDS;
+    break;
+  }
+  */
+
+  if(lightState == 3)
+    lightState = 0;
+  else
+    lightState++;
+}
 
 /* Switch on P1 (S2) */
 void
@@ -50,4 +82,45 @@ __interrupt_vec(PORT1_VECTOR) Port_1(){
     P1IFG &= ~SWITCHES;		      /* clear pending sw interrupts */
     switch_interrupt_handler();	/* single handler for all switches */
   }
+}
+
+char secondCount = 0;
+char interval = 250;
+
+void
+__interrupt_vec(WDT_VECTOR) WDT(){
+
+  secondCount++;
+  if(secondCount >= interval){
+    secondCount = 0;
+
+    blinkSwitch();
+
+  }
+}
+
+void
+blinkSwitch(){
+
+  switch(lightState){
+  case 0:
+    P1OUT &= ~LEDS;
+    interval = 125;
+    break;
+  case 1:
+    P1OUT &= ~LED_GREEN;
+    P1OUT ^= LED_RED;
+    interval = 62;
+    break;
+  case 2:
+    P1OUT &= ~LED_RED;
+    P1OUT ^= LED_GREEN;
+    interval = 31;
+    break;
+  case 3:
+    P1OUT ^= LEDS;
+    interval = 15;
+    break;
+  }
+  
 }

@@ -34,11 +34,9 @@ switch_interrupt_handler()
 
 /* up=red, down=green */
   if (p1val & SW1) {
-    P1OUT |= LED_RED;
-    P1OUT |= LED_GREEN;
+    P1OUT &= ~LEDS;
   } else {
-    P1OUT &= ~LED_GREEN;
-    P1OUT &= ~LED_RED;
+    P1OUT |= LEDS;
   }
 }
 
