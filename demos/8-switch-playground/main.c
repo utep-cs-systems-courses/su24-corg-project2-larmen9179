@@ -12,7 +12,7 @@
 #define SW4 BIT2
 
 #define SWITCHES SW1		/* only 1 switch on this board */
-#define ALTSWITCHES SW2
+#define ALTSWITCHES (SW2 | SW3 | SW4)
 
 
 
@@ -25,10 +25,10 @@ void main(void)
   P1DIR |= LEDS;
   P1OUT &= ~LEDS;		/* leds initially off */
   
-  P1REN |= SWITCHES;		/* enables resistors for switches */
-  P1IE |= SWITCHES;		/* enable interrupts from switches */
-  P1OUT |= SWITCHES;		/* pull-ups for switches */
-  P1DIR &= ~SWITCHES;		/* set switches' bits for input */
+  //P1REN |= SWITCHES;		/* enables resistors for switches */
+  //P1IE |= SWITCHES;		/* enable interrupts from switches */
+  //P1OUT |= SWITCHES;		/* pull-ups for switches */
+  //P1DIR &= ~SWITCHES;		/* set switches' bits for input */
 
   P2REN |= ALTSWITCHES;
   P2IE |= ALTSWITCHES;
@@ -43,19 +43,19 @@ void main(void)
 void
 switch_interrupt_handler()
 {
-  char p1val = P1IN;
+  //char p1val = P1IN;
   char p2val = P2IN;/* switch is in P1 */
 
 /* update switch interrupt sense to detect changes from current buttons */
-  P1IES |= (p1val & SWITCHES);	/* if switch up, sense down */
-  P1IES &= (p1val | ~SWITCHES);	/* if switch down, sense up */
+  //P1IES |= (p1val & SWITCHES);	/* if switch up, sense down */
+  //P1IES &= (p1val | ~SWITCHES);	/* if switch down, sense up */
 
   P2IES |= (p2val & ALTSWITCHES);
   P2IES &= (p2val | ~ALTSWITCHES);
 
 /* up=red, down=green */
   
-  if (!(p2val & SW2)) {
+  if (!(p2val & SW2) || !(p2val & SW3) || !(p2val & SW4)) {
     light_switch();
   }
 }

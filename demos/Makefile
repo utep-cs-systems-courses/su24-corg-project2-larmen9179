@@ -13,7 +13,8 @@ all:
 	(cd 8-switch-playground && make)
 	(cd 9* && make)
 	(cd 10* && make)
-	(cd 11* && make)
+	(cd 11-buzzer && make)
+	(cd 11-buzzer-playground && make)
 
 clean:
 	(cd timerLib && make clean)
@@ -30,5 +31,6 @@ clean:
 	(cd 8-switch-playground && make clean)
 	(cd 9* && make clean)
 	(cd 10* && make clean)
-	(cd 11* && make clean)
+	(cd 11-buzzer && make clean)
+	(cd 11-buzzer-playground && make)
 	rm -rf h lib
