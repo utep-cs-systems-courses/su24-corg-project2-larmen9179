@@ -20,16 +20,11 @@ void main(void)
 {  
   configureClocks();
   enableWDTInterrupts();
-  //buzzer_init();
+  buzzer_init();
 
   P1DIR |= LEDS;
-  P1OUT &= ~LEDS;		/* leds initially off */
+  P1OUT &= ~LEDS;
   
-  //P1REN |= SWITCHES;		/* enables resistors for switches */
-  //P1IE |= SWITCHES;		/* enable interrupts from switches */
-  //P1OUT |= SWITCHES;		/* pull-ups for switches */
-  //P1DIR &= ~SWITCHES;		/* set switches' bits for input */
-
   P2REN |= ALTSWITCHES;
   P2IE |= ALTSWITCHES;
   P2OUT |= ALTSWITCHES;
@@ -43,49 +38,28 @@ void main(void)
 void
 switch_interrupt_handler()
 {
-  //char p1val = P1IN;
-  char p2val = P2IN;/* switch is in P1 */
+  char p2val = P2IN;/* other 4 switches are in P2 */
 
 /* update switch interrupt sense to detect changes from current buttons */
-  //P1IES |= (p1val & SWITCHES);	/* if switch up, sense down */
-  //P1IES &= (p1val | ~SWITCHES);	/* if switch down, sense up */
+  /* if switch up, sense down */
+  /* if switch down, sense up */
 
   P2IES |= (p2val & ALTSWITCHES);
   P2IES &= (p2val | ~ALTSWITCHES);
 
 /* up=red, down=green */
-  
+  //If any switch is pressed, switch state
   if (!(p2val & SW2) || !(p2val & SW3) || !(p2val & SW4)) {
     light_switch();
   }
 }
 
+//global var to control light state
 int lightState = 0;
 
+//method to switch states for other functions
 void
 light_switch(){
-
-  //static int lightState = 0;
-
-  /*
-  switch(lightState){
-  case 0:
-    P1OUT &= ~LEDS;
-    break;
-  case 1:
-    P1OUT |= LED_RED;
-    P1OUT &= ~LED_GREEN;
-    break;
-  case 2:
-    P1OUT |= LED_GREEN;
-    P1OUT &= ~LED_RED;
-    break;
-  case 3:
-    P1OUT |= LEDS;
-    break;
-  }
-  */
-
   if(lightState == 3)
     lightState = 0;
   else
@@ -117,6 +91,7 @@ __interrupt_vec(WDT_VECTOR) WDT(){
   }
 }
 
+/*changes leds and led speed based off light state, called during interrupts from system*/
 void
 blinkSwitch(){
 
@@ -143,20 +118,21 @@ blinkSwitch(){
   
 }
 
+
 void
 soundSwitch(){
   switch(lightState){
   case 0:
-    //buzzer_set_period(5000);
+    buzzer_set_period(5000);
     break;
   case 1:
-    //buzzer_set_period(6000);
+    buzzer_set_period(6000);
     break;
   case 2:
-    //buzzer_set_period(7000);
+    buzzer_set_period(7000);
     break;
   case 3:
-    //buzzer_set_period(8000);
+    buzzer_set_period(8000);
     break;
   }
 }

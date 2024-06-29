@@ -32,5 +32,5 @@ clean:
 	(cd 9* && make clean)
 	(cd 10* && make clean)
 	(cd 11-buzzer && make clean)
-	(cd 11-buzzer-playground && make)
+	(cd 11-buzzer-playground && make clean)
 	rm -rf h lib
