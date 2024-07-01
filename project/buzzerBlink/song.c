@@ -163,17 +163,57 @@ void songThree(){
 
   switch(songState){
   case 0:
+    buzzer_set_period(7000);
     break;
   case 1:
+    buzzer_set_period(8000);
     break;
   case 2:
+    buzzer_set_period(9000);
     break;
   case 3:
+    buzzer_set_period(10000);
+    break;
+  case 4:
+    buzzer_set_period(11000);
+    break;
+  case 5:
+    buzzer_set_period(12000);
+    break;
+  case 6:
+    buzzer_set_period(13000);
+    break;
+  case 7:
+    buzzer_set_period(14000);
+    break;
+  case 8:
+    buzzer_set_period(13000);
+    break;
+  case 9:
+    buzzer_set_period(12000);
+    break;
+  case 10:
+    buzzer_set_period(11000);
+    break;
+  case 11:
+    buzzer_set_period(10000);
+    break;
+  case 12:
+    buzzer_set_period(9000);
+    break;
+  case 13:
+    buzzer_set_period(8000);
+    break;
+  case 14:
+    buzzer_set_period(7000);
+    break;
+  case 15:
+    buzzer_set_period(6000);
     break;
   }
 
-  if(songState == 3)
-    songState == 0;
+  if(songState == 15)
+    songState = 0;
   else
     songState++;
 }

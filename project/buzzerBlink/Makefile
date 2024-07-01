@@ -23,5 +23,5 @@ clean:
 	rm -f *.o *.elf
 
 buzzer.c: buzzer.h
-main.c: buzzer.h song.h
+main.c: buzzer.h song.h main.h
 song.c: song.h buzzer.h

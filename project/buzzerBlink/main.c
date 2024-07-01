@@ -1,6 +1,7 @@
 #include <msp430.h>
 #include "libTimer.h"
 #include "buzzer.h"
+#include "main.h"
 #include "song.h"
 
 #define LED_RED BIT6               // P1.0
