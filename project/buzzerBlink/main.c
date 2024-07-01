@@ -1,18 +1,21 @@
 #include <msp430.h>
 #include "libTimer.h"
 #include "buzzer.h"
+#include "song.h"
 
 #define LED_RED BIT6               // P1.0
 #define LED_GREEN BIT0             // P1.6
 #define LEDS (BIT0 | BIT6)
 
-#define SW1 BIT3		/* switch1 is p1.3 */
-#define SW2 BIT0
-#define SW3 BIT1
-#define SW4 BIT2
+#define SW1 BIT0		/* switch1 is p1.3 */
+#define SW2 BIT1
+#define SW3 BIT2
+#define SW4 BIT3
 
 #define SWITCHES SW1		/* only 1 switch on this board */
-#define ALTSWITCHES (SW2 | SW3 | SW4 | SW1)
+#define ALTSWITCHES (SW1 | SW2 | SW3 | SW4)
+
+
 
 void main(void) 
 {  
@@ -31,11 +34,13 @@ void main(void)
   or_sr(0x18);  // CPU off, GIE on
 } 
 
+//global var to control state for system
+char globalState = 0;
+
 void
 switch_interrupt_handler()
 {
   char p2val = P2IN;/* other 4 switches are in P2 */
-
 /* update switch interrupt sense to detect changes from current buttons */
   /* if switch up, sense down */
   /* if switch down, sense up */
@@ -45,21 +50,18 @@ switch_interrupt_handler()
 
 /* up=red, down=green */
   //If any switch is pressed, switch state
-  if (!(p2val & SW2) || !(p2val & SW3) || !(p2val & SW4) || !(p2val & SW1)) {
-    light_switch();
+  if (!(p2val & SW1)){
+    globalState = 0;
   }
-}
-
-//global var to control light state
-int lightState = 0;
-
-//method to switch states for other functions
-void
-light_switch(){
-  if(lightState == 3)
-    lightState = 0;
-  else
-    lightState++;
+  else if (!(p2val & SW2)){
+    globalState = 1;
+  }
+  else if (!(p2val & SW3)){
+    globalState = 2;
+  }
+  else if (!(p2val & SW4)){
+    globalState = 3;
+  }
 }
 
 /* Switch on P1 (S2) */
@@ -71,27 +73,33 @@ __interrupt_vec(PORT2_VECTOR) Port_2(){
   }
 }
 
-char secondCount = 0;
+char secondCountBlink = 0;
+char secondCountSound = 0;
 char interval = 250;
 
 void
 __interrupt_vec(WDT_VECTOR) WDT(){
 
-  secondCount++;
-  if(secondCount >= interval){
-    secondCount = 0;
+  secondCountBlink++;
+  secondCountSound++;
+  if(secondCountBlink >= interval){
+    secondCountBlink = 0;
 
-    blinkSwitch();
-    soundSwitch();
+    lightSwitch();
 
   }
+  if(secondCountSound >= 27){
+    secondCountSound = 0;
+    soundSwitch(globalState);
+  }
+  
 }
 
 /*changes leds and led speed based off light state, called during interrupts from system*/
 void
-blinkSwitch(){
+lightSwitch(){
 
-  switch(lightState){
+  switch(globalState){
   case 0:
     P1OUT &= ~LEDS;
     interval = 125;
@@ -116,19 +124,18 @@ blinkSwitch(){
 
 
 void
-soundSwitch(){
-  switch(lightState){
-  case 0:
-    buzzer_set_period(5000);
-    break;
-  case 1:
-    buzzer_set_period(6000);
-    break;
-  case 2:
-    buzzer_set_period(7000);
-    break;
-  case 3:
-    buzzer_set_period(8000);
-    break;
+soundSwitch(char option){
+
+  if(option == 0){
+    songOne();
+  }
+  else if(option == 1){
+    songTwo();
+  }
+  else if(option == 2){
+    songThree();
+  }
+  else if(option == 3){
+    songFour();
   }
 }
